@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itheima.mapper.CustomerMapper">
+
+
+<!-- 
+<sql id="tablename">
+${prefix}customer
+</sql>
+
+<sql id="someinclude">
+from
+<include refid="${include_target}" />		
+</sql>
+
+<sql id="customerColumns">
+id,username,jobs,phone
+</sql>
+<select id="findCustomerById" parameterType="Integer" 
+resultType="com.itheima.po.Customer">
+select 
+<include refid="customerColumns"/>
+<include refid="someinclude">
+<property name="prefix" value="t_" />
+<property name="include_target" value="tablename" />
+</include>
+where id = #{id}
+</select>
+ -->
+
+<!-- 
+<select id="findCustomerByNameAndJobs"
+parameterType="com.itheima.po.Customer"
+resultType="com.itheima.po.Customer"
+>
+
+select * from t_customer where 1=1
+<if test="username !=null and username !=''">
+and username like concat('%',#{username},'%')
+</if>
+<if test="jobs !=null and jobs !=''">
+and jobs=#{jobs}
+</if>
+</select>
+ -->
+
+<select id="findCustomerByNameOrJobs"
+parameterType="com.itheima.po.Customer"
+resultType="com.itheima.po.Customer"
+>
+select * from t_customer where 1=1
+<choose>
+<when test="username !=null and username !=''">
+and username like concat('%',#{username},'%')
+</when>
+<when test="jobs !=null and jobs !=''">
+and jobs=#{jobs}
+</when>
+<otherwise>
+and phone is not null
+</otherwise>
+</choose>
+</select>
+
+<!--
+<select id="findCustomerByNameAndJobs"
+parameterType="com.itheima.po.Customer"
+resultType="com.itheima.po.Customer"
+>
+select * from t_customer 
+<where>
+<if test="username !=null and username !=''">
+and username like concat('%',#{username},'%')
+</if>
+<if test="jobs !=null and jobs !=''">
+and jobs=#{jobs}
+</if>
+</where>
+</select>
+-->
+
+<select id="findCustomerByNameAndJobs"
+parameterType="com.itheima.po.Customer"
+resultType="com.itheima.po.Customer"
+>
+select * from t_customer 
+<trim prefix="where" prefixOverrides="and">
+<if test="username !=null and username !=''">
+and username like concat('%',#{username},'%')
+</if>
+<if test="jobs !=null and jobs !=''">
+and jobs=#{jobs}
+</if>
+</trim>
+</select>
+
+
+<update id="updateCustomer" parameterType="com.itheima.po.Customer">
+update t_customer
+<set>
+<if test="username !=null and username !=''">
+ username=#{username},
+</if>
+<if test="jobs !=null and jobs !=''">
+jobs=#{jobs},
+</if>
+<if test="phone !=null and phone !=''">
+phone=#{phone},
+</if>
+</set>
+where id=#{id}
+</update>
+
+
+<select id="findCustomerByIds" parameterType="List"
+resultType="com.itheima.po.Customer">
+select *from t_customer where id in
+<foreach item="id" index="index" collection="list"
+open="(" separator="," close=")">
+#{id}
+</foreach>
+</select>
+
+
+<select id="findCustomerByName" parameterType="com.itheima.po.Customer"
+resultType="com.itheima.po.Customer">
+<bind name="pattern_username" value="'%'+_parameter.getUsername()+'%'"/>
+select *from t_customer
+where
+username like #{pattern_username}
+</select>
+
+<!--<select id="findCustomerById" parameterType="Integer"
+            resultType="com.itheima.po.Customer">
+            select * from t_customer where id = #{id}
+</select>-->
+
+
+
+<insert id="addCustomer" parameterType="com.itheima.po.Customer"
+            keyProperty="id" useGeneratedKeys="true" >
+      insert into t_customer(username,jobs,phone)
+      values(#{username},#{jobs},#{phone})
+</insert>
+
+
+<!-- 
+<update id="updateCustomer" parameterType="com.itheima.po.Customer">
+       update t_customer 
+       set username=#{username},jobs=#{jobs},phone=#{phone}
+       where id=#{id}
+</update>
+ -->
+ 
+ 
+<delete id="deleteCustomer" parameterType="Integer">
+        delete from t_customer where id=#{id}
+</delete>
+
+
+</mapper>
+
+
+
+       
